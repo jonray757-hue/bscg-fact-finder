@@ -9,6 +9,8 @@ if git remote get-url origin &>/dev/null; then
 else
   git remote add origin "git@github.com:${USER}/${REPO}.git"
 fi
+export GIT_SSH_COMMAND="ssh -i ${HOME}/.ssh/id_ed25519_bscg -o IdentitiesOnly=yes"
+git remote set-url origin "git@github.com:${USER}/${REPO}.git"
 git push -u origin main
 echo ""
 echo "Live site (after Pages enabled): https://${USER}.github.io/${REPO}/"
