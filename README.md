@@ -2,7 +2,7 @@
 
 Client-facing interactive click-through based on the BSCG Business Owner Tax Strategy Fact Finder PDF.
 
-## Live site
+## Live site (standalone — not Retirement Everest)
 
 https://jonray757-hue.github.io/bscg-fact-finder/
 
@@ -11,6 +11,17 @@ https://jonray757-hue.github.io/bscg-fact-finder/
 ```
 https://jonray757-hue.github.io/bscg-fact-finder/?advisor=Johnny%20Harris&email=johnny@retirementfoundationforamerica.com
 ```
+
+## Deploy
+
+Repo: `jonray757-hue/bscg-fact-finder` only. Do not nest under `retirement-everest`.
+
+```bash
+cd /Users/ramseykoaharris/Work/projects/bscg-fact-finder
+./tools/push-to-github.sh
+```
+
+Enable Pages: Repo → Settings → Pages → **GitHub Actions**.
 
 ## Local preview
 
