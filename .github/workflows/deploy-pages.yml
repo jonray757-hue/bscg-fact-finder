@@ -27,10 +27,19 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
+      - name: Prepare site artifact
+        run: |
+          mkdir -p _site
+          cp index.html .nojekyll CNAME _site/ 2>/dev/null || true
+          cp -R assets _site/ 2>/dev/null || true
+          cp BSCG_Business_Owner_Tax_Strategy_Fact_Finder.pdf _site/ 2>/dev/null || true
+          # CNAME is required for custom domain (factfinder.blacksandcapitalgrp.com)
+          test -f CNAME && cp CNAME _site/
+
       - name: Upload site
         uses: actions/upload-pages-artifact@v3
         with:
-          path: .
+          path: _site
 
       - name: Deploy to GitHub Pages
         id: deployment
