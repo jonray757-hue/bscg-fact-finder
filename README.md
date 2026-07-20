@@ -12,6 +12,19 @@ https://jonray757-hue.github.io/bscg-fact-finder/
 https://jonray757-hue.github.io/bscg-fact-finder/?advisor=Johnny%20Harris&email=johnny@retirementfoundationforamerica.com
 ```
 
+### Fondako leads (route to Strategy GHL via Make)
+
+```
+https://jonray757-hue.github.io/bscg-fact-finder/?source=fondako&advisor=Johnny%20Harris&email=johnny@retirementfoundationforamerica.com
+```
+
+Or: `?brand=fondako` / `?fondako=1`
+
+Submit posts to Make.com (`hook.us2.make.com/...`) which routes:
+- **Fondako** → Strategy GHL sub-account
+- **Everyone else** → BSCG GHL sub-account  
+Fact-finder notes are included in the payload as `notes` for the contact.
+
 ## Deploy
 
 Repo: `jonray757-hue/bscg-fact-finder` only. Do not nest under `retirement-everest`.

@@ -714,17 +714,23 @@
 </div>
 
 <script>
-// ─── Config (override via URL: ?advisor=Name&email=advisor@domain.com) ───────
+// ─── Config (override via URL: ?advisor=Name&email=advisor@domain.com&source=fondako) ─
+// Webhook → Make.com router: Fondako leads → Strategy GHL; everyone else → BSCG GHL.
 const CONFIG = {
   advisorEmail: 'johnny@retirementfoundationforamerica.com',
   advisorName: 'Your BSCG Advisor',
   storageKey: 'bscg-fact-finder-v1',
-  webhookUrl: 'https://services.leadconnectorhq.com/hooks/UeAtlT0oS5n9RHD70I2U/webhook-trigger/be827838-c5a8-4655-8e61-ec7be7874ce9' // optional GHL/form webhook — set when wired
+  webhookUrl: 'https://hook.us2.make.com/lbqmt46dm894d759avjndlbwif5tepui'
 };
 
 const params = new URLSearchParams(location.search);
 if (params.get('advisor')) CONFIG.advisorName = params.get('advisor');
 if (params.get('email')) CONFIG.advisorEmail = params.get('email');
+// Routing signals for Make / GHL (Fondako → Strategy sub-account)
+if (params.get('source')) CONFIG.leadSource = params.get('source');
+if (params.get('brand')) CONFIG.brand = params.get('brand');
+if (params.get('utm_source')) CONFIG.utmSource = params.get('utm_source');
+if (params.get('fondako') === '1' || params.get('fondako') === 'true') CONFIG.leadSource = CONFIG.leadSource || 'fondako';
 
 // ─── Data model ───────────────────────────────────────────────────────────────
 const data = {};
@@ -945,11 +951,57 @@ function loadProgress() {
   } catch (e) { return false; }
 }
 
+function buildFactFinderNotes(payload) {
+  const lines = [
+    'BSCG Business Owner Tax Strategy Fact Finder',
+    `Submitted: ${payload.submittedAt}`,
+    `Client: ${payload.name || ''}`,
+    `Business: ${payload.company_name || ''}`,
+    `Email: ${payload.email || ''}`,
+    `Phone: ${payload.phone || ''}`,
+    `Advisor: ${payload.advisor || ''}`,
+    `Lead source: ${payload.lead_source || payload.source || ''}`,
+    `Brand: ${payload.brand || ''}`,
+    `URL: ${payload.page_url || ''}`,
+    '',
+    '--- Categories ---',
+    (payload.categories || []).join(', ') || '(none)',
+    '',
+    '--- Next steps ---',
+    (payload.nextSteps || []).join(', ') || '(none)',
+    '',
+    '--- Field responses ---'
+  ];
+  const fields = payload.client || {};
+  Object.keys(fields).sort().forEach(k => {
+    const v = fields[k];
+    if (v == null || v === '') return;
+    lines.push(`${k}: ${Array.isArray(v) ? v.join('; ') : v}`);
+  });
+  lines.push('', '--- Answers ---');
+  const answers = payload.answers || {};
+  Object.keys(answers).sort().forEach(k => {
+    const v = answers[k];
+    if (v == null || v === '' || (Array.isArray(v) && !v.length)) return;
+    lines.push(`${k}: ${Array.isArray(v) ? v.join('; ') : v}`);
+  });
+  return lines.join('\n');
+}
+
 function buildExportPayload() {
   const fields = getFieldValues();
   const fullName = (fields['ci-client'] || '').trim();
   const parts = fullName.split(/\s+/).filter(Boolean);
-  return {
+  const advisor = document.getElementById('ci-advisor')?.value || CONFIG.advisorName;
+  const leadSource = (CONFIG.leadSource || CONFIG.utmSource || CONFIG.brand || 'bscg').toLowerCase();
+  const isFondako = /fondako/.test(leadSource)
+    || /fondako/.test((CONFIG.brand || '').toLowerCase())
+    || /fondako/.test((advisor || '').toLowerCase())
+    || /fondako/.test((CONFIG.advisorEmail || '').toLowerCase())
+    || params.get('fondako') === '1'
+    || params.get('fondako') === 'true';
+
+  const payload = {
     first_name: parts[0] || '',
     last_name: parts.slice(1).join(' ') || '',
     name: fullName,
@@ -959,12 +1011,26 @@ function buildExportPayload() {
     source: 'BSCG Fact Finder',
     type: 'bscg-fact-finder',
     submittedAt: new Date().toISOString(),
-    advisor: document.getElementById('ci-advisor')?.value || CONFIG.advisorName,
+    advisor,
+    advisor_email: CONFIG.advisorEmail,
+    // Make.com routing: Fondako → Strategy sub-account; else → BSCG
+    lead_source: leadSource,
+    brand: (CONFIG.brand || leadSource || 'bscg').toLowerCase(),
+    is_fondako: isFondako,
+    ghl_target: isFondako ? 'strategy' : 'bscg',
+    page_url: location.href,
+    referrer: document.referrer || '',
     client: fields,
     answers: { ...data },
     categories: inferCategories(),
     nextSteps: inferNextSteps()
   };
+  // Human-readable notes for GHL contact notes field
+  payload.notes = buildFactFinderNotes(payload);
+  payload.tags = isFondako
+    ? ['fact-finder', 'fondako', 'strategy']
+    : ['fact-finder', 'bscg'];
+  return payload;
 }
 
 function submitFactFinder() {
