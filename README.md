@@ -12,7 +12,7 @@ https://jonray757-hue.github.io/bscg-fact-finder/
 https://jonray757-hue.github.io/bscg-fact-finder/?advisor=Johnny%20Harris&email=johnny@retirementfoundationforamerica.com
 ```
 
-### Fondako leads (route to Strategy GHL via Make)
+### Fondako leads (tagged in Strategy GHL via Make)
 
 ```
 https://jonray757-hue.github.io/bscg-fact-finder/?source=fondako&advisor=Johnny%20Harris&email=johnny@retirementfoundationforamerica.com
@@ -20,10 +20,17 @@ https://jonray757-hue.github.io/bscg-fact-finder/?source=fondako&advisor=Johnny%
 
 Or: `?brand=fondako` / `?fondako=1`
 
-Submit posts to Make.com (`hook.us2.make.com/...`) which routes:
-- **Fondako** → Strategy GHL sub-account
-- **Everyone else** → BSCG GHL sub-account  
-Fact-finder notes are included in the payload as `notes` for the contact.
+Other sources (examples):
+```
+?source=website
+?source=organic
+?utm_source=google
+```
+
+Submit posts to Make.com (`hook.us2.make.com/...`):
+- **All contacts** land in the **Strategy** GHL sub-account (not BSCG)
+- **Fondako** vs website / organic / etc. = **tags only** (`is_fondako`, `source_tag`, `tags[]`)
+- Fact-finder notes are in the payload as `notes` for the contact
 
 ## Deploy
 

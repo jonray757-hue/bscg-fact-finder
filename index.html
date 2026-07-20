@@ -715,7 +715,8 @@
 
 <script>
 // ─── Config (override via URL: ?advisor=Name&email=advisor@domain.com&source=fondako) ─
-// Webhook → Make.com router: Fondako leads → Strategy GHL; everyone else → BSCG GHL.
+// Webhook → Make.com → ALL contacts land in Strategy GHL sub-account.
+// Fondako vs website/organic/etc. is tags only (not a separate BSCG sub-account).
 const CONFIG = {
   advisorEmail: 'johnny@retirementfoundationforamerica.com',
   advisorName: 'Your BSCG Advisor',
@@ -726,7 +727,7 @@ const CONFIG = {
 const params = new URLSearchParams(location.search);
 if (params.get('advisor')) CONFIG.advisorName = params.get('advisor');
 if (params.get('email')) CONFIG.advisorEmail = params.get('email');
-// Routing signals for Make / GHL (Fondako → Strategy sub-account)
+// Source signals for Strategy tags (Fondako vs website / organic / etc.)
 if (params.get('source')) CONFIG.leadSource = params.get('source');
 if (params.get('brand')) CONFIG.brand = params.get('brand');
 if (params.get('utm_source')) CONFIG.utmSource = params.get('utm_source');
@@ -993,13 +994,20 @@ function buildExportPayload() {
   const fullName = (fields['ci-client'] || '').trim();
   const parts = fullName.split(/\s+/).filter(Boolean);
   const advisor = document.getElementById('ci-advisor')?.value || CONFIG.advisorName;
-  const leadSource = (CONFIG.leadSource || CONFIG.utmSource || CONFIG.brand || 'bscg').toLowerCase();
+  // Default non-Fondako source for tagging (website / organic / etc. via URL)
+  const leadSource = (CONFIG.leadSource || CONFIG.utmSource || CONFIG.brand || 'website').toLowerCase();
   const isFondako = /fondako/.test(leadSource)
     || /fondako/.test((CONFIG.brand || '').toLowerCase())
     || /fondako/.test((advisor || '').toLowerCase())
     || /fondako/.test((CONFIG.advisorEmail || '').toLowerCase())
     || params.get('fondako') === '1'
     || params.get('fondako') === 'true';
+
+  // Sanitize source label for a GHL-friendly tag (e.g. "google ads" → "google-ads")
+  const sourceTag = String(isFondako ? 'fondako' : leadSource)
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '') || 'website';
 
   const payload = {
     first_name: parts[0] || '',
@@ -1013,11 +1021,12 @@ function buildExportPayload() {
     submittedAt: new Date().toISOString(),
     advisor,
     advisor_email: CONFIG.advisorEmail,
-    // Make.com routing: Fondako → Strategy sub-account; else → BSCG
-    lead_source: leadSource,
-    brand: (CONFIG.brand || leadSource || 'bscg').toLowerCase(),
+    // Make.com: ALL leads → Strategy sub-account; differentiate with tags only
+    lead_source: isFondako ? 'fondako' : leadSource,
+    brand: (CONFIG.brand || (isFondako ? 'fondako' : leadSource) || 'website').toLowerCase(),
     is_fondako: isFondako,
-    ghl_target: isFondako ? 'strategy' : 'bscg',
+    ghl_target: 'strategy',
+    ghl_location: 'strategy',
     page_url: location.href,
     referrer: document.referrer || '',
     client: fields,
@@ -1027,9 +1036,16 @@ function buildExportPayload() {
   };
   // Human-readable notes for GHL contact notes field
   payload.notes = buildFactFinderNotes(payload);
+  // Tags: always Strategy + fact-finder; Fondako vs website/organic/etc.
   payload.tags = isFondako
-    ? ['fact-finder', 'fondako', 'strategy']
-    : ['fact-finder', 'bscg'];
+    ? ['fact-finder', 'fondako', 'strategy', 'source-fondako']
+    : ['fact-finder', 'strategy', `source-${sourceTag}`];
+  if (!isFondako && sourceTag !== 'website' && sourceTag !== 'organic') {
+    // keep explicit source tag already added; optional plain source label
+    payload.source_tag = sourceTag;
+  } else {
+    payload.source_tag = isFondako ? 'fondako' : sourceTag;
+  }
   return payload;
 }
 
