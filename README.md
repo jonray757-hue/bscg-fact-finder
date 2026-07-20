@@ -2,7 +2,7 @@
 
 Client-facing interactive click-through based on the BSCG Business Owner Tax Strategy Fact Finder PDF.
 
-## Live site (standalone — not Retirement Everest)
+## Live site
 
 https://jonray757-hue.github.io/bscg-fact-finder/
 
@@ -37,7 +37,7 @@ Submit posts **directly to GoHighLevel** (Strategy location inbound webhook — 
 
 ## Deploy
 
-Repo: `jonray757-hue/bscg-fact-finder` only. Do not nest under `retirement-everest`.
+Repo: `jonray757-hue/bscg-fact-finder` only.
 
 ```bash
 cd /Users/ramseykoaharris/Work/projects/bscg-fact-finder
