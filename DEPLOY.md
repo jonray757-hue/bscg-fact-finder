@@ -8,4 +8,4 @@ Open: https://github.com/jonray757-hue/bscg-fact-finder/settings/pages
 
 Live in 1–2 minutes:
 
-https://jonray757-hue.github.io/bscg-fact-finder/
+https://jonray757-hue.github.io/bscg-fact-finder/Deployed webhook: GHL Strategy Wc84… 2026-07-20T22:39:30Z
