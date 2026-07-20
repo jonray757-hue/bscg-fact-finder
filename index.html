@@ -715,13 +715,13 @@
 
 <script>
 // ─── Config (override via URL: ?advisor=Name&email=advisor@domain.com&source=fondako) ─
-// Webhook → Make.com → ALL contacts land in Strategy GHL sub-account.
-// Fondako vs website/organic/etc. is tags only (not a separate BSCG sub-account).
+// Webhook → GHL inbound (Strategy location) directly — Make dropped.
+// Fondako vs website/organic/etc. is tags only.
 const CONFIG = {
   advisorEmail: 'johnny@retirementfoundationforamerica.com',
   advisorName: 'Your BSCG Advisor',
   storageKey: 'bscg-fact-finder-v1',
-  webhookUrl: 'https://hook.us2.make.com/lbqmt46dm894d759avjndlbwif5tepui'
+  webhookUrl: 'https://services.leadconnectorhq.com/hooks/kxST06uaWK8TXSYUp0j9/webhook-trigger/Wc84awDofOqlinOdKYIj'
 };
 
 const params = new URLSearchParams(location.search);

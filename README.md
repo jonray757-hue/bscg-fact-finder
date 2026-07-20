@@ -27,8 +27,11 @@ Other sources (examples):
 ?utm_source=google
 ```
 
-Submit posts to Make.com (`hook.us2.make.com/...`):
-- **All contacts** land in the **Strategy** GHL sub-account (not BSCG)
+Submit posts **directly to GoHighLevel** (Strategy location inbound webhook — Make removed):
+
+`https://services.leadconnectorhq.com/hooks/kxST06uaWK8TXSYUp0j9/webhook-trigger/Wc84awDofOqlinOdKYIj`
+
+- **All contacts** land in **Black Sand Strategy** (`kxST06uaWK8TXSYUp0j9`)
 - **Fondako** vs website / organic / etc. = **tags only** (`is_fondako`, `source_tag`, `tags[]`)
 - Fact-finder notes are in the payload as `notes` for the contact
 
