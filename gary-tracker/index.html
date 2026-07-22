@@ -418,7 +418,8 @@
 
   <footer>
     Retirement Foundation for America / Black Sand Capital Group · For planning discussion only — not tax, legal, or investment advice.
-    Data saves on this device until you submit. Questions: text or email Johnny.
+    Data saves on this device. Submit opens an email summary to Johnny — nothing posts to CRM from this page.
+    Questions: text or email Johnny.
   </footer>
 </div>
 
@@ -431,16 +432,16 @@
     <div style="display:flex;gap:8px;flex-wrap:wrap">
       <button type="button" class="btn btn-secondary" onclick="saveLocal(true)">Save draft</button>
       <button type="button" class="btn btn-ghost" onclick="downloadJson()">Download copy</button>
-      <button type="button" class="btn btn-primary" id="btnSubmit" onclick="submitForm()">Save updates</button>
+      <button type="button" class="btn btn-primary" id="btnSubmit" onclick="submitForm()">Email summary</button>
     </div>
   </div>
 </div>
 
 <script>
 const STORAGE_KEY = 'gary-marchuk-conversation-tracker-v1';
-// Delivery off for now — no CRM webhook, no mailto until Johnny turns them on
+// Email summary ON. No CRM webhook (no BSS / BSCG / Strategy). RFFA notes, if any, are updated manually by Johnny — never from this public page.
 const ENABLE_WEBHOOK = false;
-const ENABLE_MAILTO = false;
+const ENABLE_MAILTO = true;
 const ADVISOR_EMAIL = 'johnny@retirementfoundationforamerica.com';
 const WEBHOOK_URL = '';
 
@@ -577,7 +578,7 @@ async function submitForm() {
   const d = collect();
   const btn = $('btnSubmit');
   btn.disabled = true;
-  setStatus('Saving…');
+  setStatus('Preparing email summary…');
   saveLocal(false);
 
   // Keep a dated snapshot so updates aren’t lost if he keeps editing
@@ -587,7 +588,7 @@ async function submitForm() {
     localStorage.setItem(STORAGE_KEY + '-submits', JSON.stringify(snaps.slice(-20)));
   } catch (_) {}
 
-  // Delivery intentionally OFF until Johnny enables it
+  // Webhook stays OFF — do not post to BSS, BSCG, Strategy, or any GHL location from this page
   if (ENABLE_WEBHOOK && WEBHOOK_URL) {
     try {
       await fetch(WEBHOOK_URL, {
@@ -612,12 +613,13 @@ async function submitForm() {
     const subject = encodeURIComponent('Gary Marchuk — Conversation Tracker (online submit)');
     const body = encodeURIComponent(formatEmailBody(d));
     window.location.href = `mailto:${ADVISOR_EMAIL}?subject=${subject}&body=${body}`;
+    setStatus(
+      'Draft saved. Your email app should open with a summary to Johnny — send when ready. Nothing was posted to CRM.',
+      'ok'
+    );
+  } else {
+    setStatus('Updates saved on this device. Use Download copy if you want a file.', 'ok');
   }
-
-  setStatus(
-    'Updates saved. Nothing was emailed or sent to our CRM — Johnny will review with you on Zoom (or you can use Download copy if you want a file).',
-    'ok'
-  );
   btn.disabled = false;
 }
 
