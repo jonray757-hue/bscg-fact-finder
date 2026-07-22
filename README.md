@@ -35,6 +35,16 @@ Submit posts **directly to GoHighLevel** (Strategy location inbound webhook — 
 - **Fondako** vs website / organic / etc. = **tags only** (`is_fondako`, `source_tag`, `tags[]`)
 - Fact-finder notes are in the payload as `notes` for the contact
 
+## Gary Marchuk conversation tracker (fillable)
+
+https://jonray757-hue.github.io/bscg-fact-finder/gary-tracker/
+
+Custom domain (if CNAME active):
+
+https://factfinder.blacksandcapitalgrp.com/gary-tracker/
+
+Pre-filled from Roth conversion calls; submits via email + optional Strategy GHL webhook.
+
 ## Deploy
 
 Repo: `jonray757-hue/bscg-fact-finder` only.

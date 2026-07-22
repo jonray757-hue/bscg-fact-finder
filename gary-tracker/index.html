@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Conversation Tracker — Gary Marchuk · Fill Online</title>
+<style>
+  :root {
+    --ink: #1a2332;
+    --muted: #5a6570;
+    --line: #d0d7e0;
+    --brand: #0f3d2e;
+    --brand2: #1a5c45;
+    --soft: #e8f2ed;
+    --accent: #c45c26;
+    --warn: #fff6eb;
+    --ok: #eaf6ef;
+    --bg: #f0f3f6;
+    --card: #fff;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.45;
+    font-size: 15px;
+  }
+  .top {
+    background: linear-gradient(135deg, var(--brand), var(--brand2));
+    color: #fff;
+    padding: 22px 18px 20px;
+  }
+  .top-inner { max-width: 820px; margin: 0 auto; }
+  .eyebrow { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; opacity: .85; }
+  h1 { margin: 6px 0 8px; font-size: 24px; line-height: 1.2; }
+  .top p { margin: 0; opacity: .93; font-size: 14px; max-width: 620px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+  .chip {
+    background: rgba(255,255,255,.14);
+    border: 1px solid rgba(255,255,255,.25);
+    border-radius: 999px;
+    padding: 5px 11px;
+    font-size: 12px;
+  }
+  .wrap { max-width: 820px; margin: 0 auto; padding: 18px 16px 100px; }
+  .banner {
+    background: var(--warn);
+    border-left: 4px solid var(--accent);
+    padding: 12px 14px;
+    border-radius: 0 10px 10px 0;
+    margin-bottom: 16px;
+    font-size: 13.5px;
+  }
+  section {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 16px 16px 14px;
+    margin-bottom: 12px;
+  }
+  h2 {
+    margin: 0 0 12px;
+    font-size: 15px;
+    color: var(--brand);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  h2 .n {
+    width: 24px; height: 24px; border-radius: 50%;
+    background: var(--soft); color: var(--brand);
+    font-size: 12px; font-weight: 700;
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+  @media (max-width: 680px) {
+    .grid2, .grid3 { grid-template-columns: 1fr; }
+  }
+  label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: .03em;
+    margin-bottom: 4px;
+  }
+  input[type="text"], input[type="email"], input[type="tel"], input[type="number"], select, textarea {
+    width: 100%;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 9px 10px;
+    font-size: 14px;
+    font-family: inherit;
+    background: #fff;
+    color: var(--ink);
+  }
+  input:focus, select:focus, textarea:focus {
+    outline: 2px solid rgba(15,61,46,.25);
+    border-color: var(--brand);
+  }
+  textarea { min-height: 72px; resize: vertical; }
+  .field { margin-bottom: 10px; }
+  .hint { font-size: 12px; color: var(--muted); margin-top: 3px; }
+  .checkrow {
+    display: flex; gap: 8px; align-items: flex-start;
+    padding: 8px 0; border-bottom: 1px solid #eef1f4; font-size: 13.5px;
+  }
+  .checkrow:last-child { border-bottom: 0; }
+  .checkrow input { margin-top: 3px; width: auto; }
+  .pillbox {
+    background: var(--soft);
+    border: 1px solid #c5ddd0;
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 13px;
+    margin-bottom: 10px;
+  }
+  .sticky-bar {
+    position: fixed; left: 0; right: 0; bottom: 0;
+    background: rgba(255,255,255,.96);
+    border-top: 1px solid var(--line);
+    padding: 10px 16px;
+    backdrop-filter: blur(8px);
+    z-index: 50;
+  }
+  .sticky-inner {
+    max-width: 820px; margin: 0 auto;
+    display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between;
+  }
+  .btn {
+    border: none; border-radius: 8px; padding: 11px 16px;
+    font-size: 13.5px; font-weight: 600; cursor: pointer; font-family: inherit;
+  }
+  .btn-primary { background: var(--brand); color: #fff; }
+  .btn-primary:hover { filter: brightness(1.08); }
+  .btn-secondary { background: #e8ecf0; color: var(--ink); }
+  .btn-ghost { background: transparent; color: var(--brand); border: 1px solid var(--brand); }
+  .status { font-size: 12.5px; color: var(--muted); }
+  .status.ok { color: #1b7a45; font-weight: 600; }
+  .status.err { color: #b42318; font-weight: 600; }
+  .saved { font-size: 12px; color: var(--muted); }
+  footer {
+    text-align: center; color: var(--muted); font-size: 11px; margin-top: 8px; padding: 0 8px;
+  }
+</style>
+</head>
+<body>
+<div class="top">
+  <div class="top-inner">
+    <div class="eyebrow">Live conversation tracker · Retirement Foundation for America</div>
+    <h1>Gary Marchuk — update your numbers online</h1>
+    <p>
+      Pre-filled from our calls. Edit anything that looks off, then submit — it comes straight to Johnny.
+      Takes about 5–10 minutes. You can save and come back on this device.
+    </p>
+    <div class="chips">
+      <span class="chip">Next: Wed 11:00 AM Eastern · Zoom</span>
+      <span class="chip">No planning fees</span>
+      <span class="chip">Tax map first · product optional</span>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="banner">
+    <strong>Tip:</strong> Yellow-priority fields drive IRMAA room (especially <em>annual</em> muni interest).
+    Leave blanks if easier to cover on Zoom.
+  </div>
+
+  <form id="trackerForm" onsubmit="return false;">
+    <section>
+      <h2><span class="n">1</span> Contact</h2>
+      <div class="grid2">
+        <div class="field">
+          <label for="fullName">Your name</label>
+          <input id="fullName" name="fullName" type="text" value="Gary Marchuk" />
+        </div>
+        <div class="field">
+          <label for="spouseName">Spouse name</label>
+          <input id="spouseName" name="spouseName" type="text" placeholder="Optional" />
+        </div>
+        <div class="field">
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" value="gmarchuk@icloud.com" />
+        </div>
+        <div class="field">
+          <label for="phone">Phone</label>
+          <input id="phone" name="phone" type="tel" value="+16783004234" />
+        </div>
+        <div class="field">
+          <label for="ageYou">Your age</label>
+          <input id="ageYou" name="ageYou" type="text" value="67" />
+        </div>
+        <div class="field">
+          <label for="ageSpouse">Spouse age</label>
+          <input id="ageSpouse" name="ageSpouse" type="text" value="63" />
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2><span class="n">2</span> What you want from this work</h2>
+      <div class="field">
+        <label for="primaryGoal">Primary goal</label>
+        <textarea id="primaryGoal" name="primaryGoal">Optimized multi-year Roth conversion plan — better than Fidelity/Schwab software or pure DIY spreadsheet.</textarea>
+      </div>
+      <div class="pillbox">
+        Hard constraints we heard (uncheck if wrong):
+        <div class="checkrow"><input type="checkbox" id="c1" checked /> <label for="c1" style="text-transform:none;font-weight:500;color:inherit">Don’t push into a higher tax bracket if avoidable</label></div>
+        <div class="checkrow"><input type="checkbox" id="c2" checked /> <label for="c2" style="text-transform:none;font-weight:500;color:inherit">Don’t trigger Medicare IRMAA</label></div>
+        <div class="checkrow"><input type="checkbox" id="c3" checked /> <label for="c3" style="text-transform:none;font-weight:500;color:inherit">Count CD interest, munis, and 2028 annuity event in models</label></div>
+        <div class="checkrow"><input type="checkbox" id="c4" checked /> <label for="c4" style="text-transform:none;font-weight:500;color:inherit">Prefer liquid / transparent accounts over locked products</label></div>
+        <div class="checkrow"><input type="checkbox" id="c5" checked /> <label for="c5" style="text-transform:none;font-weight:500;color:inherit">Not looking for an “income product” — cash flow mostly covered</label></div>
+      </div>
+      <div class="field">
+        <label for="otherGoals">Anything else you want us to prioritize?</label>
+        <textarea id="otherGoals" name="otherGoals" placeholder="Legacy for kids, Social Security timing, etc."></textarea>
+      </div>
+    </section>
+
+    <section>
+      <h2><span class="n">3</span> Pre-tax balances (conversion fuel)</h2>
+      <div class="grid2">
+        <div class="field">
+          <label for="iraYou">Your IRAs / rollovers (approx $)</label>
+          <input id="iraYou" name="iraYou" type="text" value="1800000" />
+          <div class="hint">Call note: ~$1.8M at Fidelity / Schwab</div>
+        </div>
+        <div class="field">
+          <label for="iraSpouse">Spouse IRAs / rollovers (approx $)</label>
+          <input id="iraSpouse" name="iraSpouse" type="text" value="250000" />
+        </div>
+        <div class="field">
+          <label for="iraConservative">Conservative / CD-Treasury sleeve (approx $)</label>
+          <input id="iraConservative" name="iraConservative" type="text" value="1000000" />
+          <div class="hint">Earlier call: ~$1M low-risk sleeve</div>
+        </div>
+        <div class="field">
+          <label for="iraMarket">Market / equity sleeve (approx $)</label>
+          <input id="iraMarket" name="iraMarket" type="text" value="700000" />
+          <div class="hint">Earlier call: ~$700k invested</div>
+        </div>
+        <div class="field">
+          <label for="custodians">Custodians</label>
+          <input id="custodians" name="custodians" type="text" value="Fidelity, Schwab" />
+        </div>
+        <div class="field">
+          <label for="rothStatus">Roth status</label>
+          <input id="rothStatus" name="rothStatus" type="text" value="Roth account opened; funding / plan in progress" />
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2><span class="n">4</span> Income (critical for IRMAA)</h2>
+      <div class="grid2">
+        <div class="field">
+          <label for="ssYou">Your Social Security ($ / month)</label>
+          <input id="ssYou" name="ssYou" type="text" value="4100" style="background:#fffdf5" />
+        </div>
+        <div class="field">
+          <label for="ssSpouse">Spouse Social Security ($ / month)</label>
+          <input id="ssSpouse" name="ssSpouse" type="text" placeholder="Needed" style="background:#fffdf5" />
+        </div>
+        <div class="field">
+          <label for="muniAnnual">Muni interest — ANNUAL total ($)</label>
+          <input id="muniAnnual" name="muniAnnual" type="text" placeholder="e.g. 35000" style="background:#fffdf5" />
+          <div class="hint">Tax-free still counts for IRMAA. Call mixed ~$3–3.5k/mo vs ~$33–35k/yr — please lock one number.</div>
+        </div>
+        <div class="field">
+          <label for="muniMonthly">Muni cash flow — monthly avg ($)</label>
+          <input id="muniMonthly" name="muniMonthly" type="text" value="3200" />
+          <div class="hint">Optional if you fill annual above</div>
+        </div>
+        <div class="field">
+          <label for="cdInterest">Laddered CD interest ($ / year)</label>
+          <input id="cdInterest" name="cdInterest" type="text" value="15000" style="background:#fffdf5" />
+        </div>
+        <div class="field">
+          <label for="w2">W-2 / earned income ($ / year)</label>
+          <input id="w2" name="w2" type="text" value="0" />
+        </div>
+        <div class="field">
+          <label for="otherIncome">Other income ($ / year)</label>
+          <input id="otherIncome" name="otherIncome" type="text" placeholder="Pensions, gains, etc." />
+        </div>
+        <div class="field">
+          <label for="filingStatus">Filing status</label>
+          <select id="filingStatus" name="filingStatus">
+            <option value="MFJ" selected>Married filing jointly</option>
+            <option value="MFS">Married filing separately</option>
+            <option value="Single">Single</option>
+            <option value="Other">Other / not sure</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2><span class="n">5</span> 2028 fixed annuity event</h2>
+      <div class="grid2">
+        <div class="field">
+          <label for="annuityValue">Approx value ($)</label>
+          <input id="annuityValue" name="annuityValue" type="text" value="35000" />
+        </div>
+        <div class="field">
+          <label for="annuityYear">Year it may become taxable</label>
+          <input id="annuityYear" name="annuityYear" type="text" value="2028" />
+        </div>
+        <div class="field" style="grid-column:1/-1">
+          <label for="annuityNotes">Carrier / notes / rollover options you know</label>
+          <textarea id="annuityNotes" name="annuityNotes" placeholder="Optional — we can gather live on Zoom"></textarea>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2><span class="n">6</span> Your DIY conversion plan</h2>
+      <div class="grid3">
+        <div class="field">
+          <label for="diyLow">Annual conversion target low ($)</label>
+          <input id="diyLow" name="diyLow" type="text" value="60000" />
+        </div>
+        <div class="field">
+          <label for="diyHigh">Annual conversion target high ($)</label>
+          <input id="diyHigh" name="diyHigh" type="text" value="100000" />
+        </div>
+        <div class="field">
+          <label for="targetBracket">Preferred federal bracket</label>
+          <input id="targetBracket" name="targetBracket" type="text" value="12% preferred; open to 22% if needed" />
+        </div>
+      </div>
+      <div class="field">
+        <label for="diyNotes">What you’ve already modeled or completed</label>
+        <textarea id="diyNotes" name="diyNotes">Built own spreadsheet; looking for optimized plan / second opinion. Fidelity & Schwab tools not sufficient.</textarea>
+      </div>
+    </section>
+
+    <section>
+      <h2><span class="n">7</span> Risk, income goal, legacy</h2>
+      <div class="grid2">
+        <div class="field">
+          <label for="riskPct">Approx % in markets</label>
+          <input id="riskPct" name="riskPct" type="text" value="30-35%" />
+        </div>
+        <div class="field">
+          <label for="incomeGap">Extra monthly income desired (if any)</label>
+          <input id="incomeGap" name="incomeGap" type="text" value="~$1,000–$1,500 optional (earlier call)" />
+        </div>
+        <div class="field" style="grid-column:1/-1">
+          <label for="legacyNotes">Legacy / children notes</label>
+          <textarea id="legacyNotes" name="legacyNotes">Four children — two lower-tax situation (~10%), two higher (~40%). Estate intentionally imbalanced to help those who need it most. Roth conversions also help heirs.</textarea>
+        </div>
+        <div class="field" style="grid-column:1/-1">
+          <label for="estateNotes">Estate / trust notes</label>
+          <textarea id="estateNotes" name="estateNotes">Attorney suggested living trust may not be required if beneficiaries are set. No life insurance currently.</textarea>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2><span class="n">8</span> Annuity preferences (on the record)</h2>
+      <div class="checkrow"><input type="checkbox" id="a1" checked /> <label for="a1" style="text-transform:none;font-weight:500;color:inherit">Concerned about surrender charges / day-one value drop</label></div>
+      <div class="checkrow"><input type="checkbox" id="a2" checked /> <label for="a2" style="text-transform:none;font-weight:500;color:inherit">Need liquidity / don’t want multi-year lockup without clear access</label></div>
+      <div class="checkrow"><input type="checkbox" id="a3" checked /> <label for="a3" style="text-transform:none;font-weight:500;color:inherit">Want transparent, trackable values</label></div>
+      <div class="checkrow"><input type="checkbox" id="a4" checked /> <label for="a4" style="text-transform:none;font-weight:500;color:inherit">Not seeking an annuity for monthly income</label></div>
+      <div class="field" style="margin-top:10px">
+        <label for="annuityOpen">Would you still review an illustration if it only supports Roth conversion logistics (optional)?</label>
+        <select id="annuityOpen" name="annuityOpen">
+          <option value="listen-optional" selected>Open to a short listen if tax map comes first — no pressure</option>
+          <option value="no">Prefer not to discuss annuities at all</option>
+          <option value="yes">Yes — willing to compare access / free withdrawals carefully</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="annuityComments">Your words on structure / control</label>
+        <textarea id="annuityComments" name="annuityComments">Prefer not to put large chunks into products with heavy surrender charges or values that feel like a black box.</textarea>
+      </div>
+    </section>
+
+    <section>
+      <h2><span class="n">9</span> Corrections &amp; open questions</h2>
+      <div class="field">
+        <label for="corrections">Anything we got wrong on prior calls?</label>
+        <textarea id="corrections" name="corrections" placeholder="Type corrections here…"></textarea>
+      </div>
+      <div class="field">
+        <label for="questions">Questions for Wednesday</label>
+        <textarea id="questions" name="questions" placeholder="What do you want answered first?"></textarea>
+      </div>
+      <div class="field">
+        <label for="bestContact">Best way to reach you before the Zoom</label>
+        <input id="bestContact" name="bestContact" type="text" value="Text or email" />
+      </div>
+    </section>
+  </form>
+
+  <footer>
+    Retirement Foundation for America / Black Sand Capital Group · For planning discussion only — not tax, legal, or investment advice.
+    Data saves on this device until you submit. Questions: text or email Johnny.
+  </footer>
+</div>
+
+<div class="sticky-bar">
+  <div class="sticky-inner">
+    <div>
+      <div class="status" id="status">Ready when you are</div>
+      <div class="saved" id="savedHint">Autosaves on this device</div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button type="button" class="btn btn-secondary" onclick="saveLocal(true)">Save draft</button>
+      <button type="button" class="btn btn-ghost" onclick="downloadJson()">Download copy</button>
+      <button type="button" class="btn btn-primary" id="btnSubmit" onclick="submitForm()">Submit to Johnny</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const STORAGE_KEY = 'gary-marchuk-conversation-tracker-v1';
+const ADVISOR_EMAIL = 'johnny@retirementfoundationforamerica.com';
+// Optional GHL webhook (Strategy) — same pattern as fact finder; tags identify this form
+const WEBHOOK_URL = 'https://services.leadconnectorhq.com/hooks/kxST06uaWK8TXSYUp0j9/webhook-trigger/Wc84awDofOqlinOdKYIj';
+
+const FIELD_IDS = [
+  'fullName','spouseName','email','phone','ageYou','ageSpouse','primaryGoal','otherGoals',
+  'iraYou','iraSpouse','iraConservative','iraMarket','custodians','rothStatus',
+  'ssYou','ssSpouse','muniAnnual','muniMonthly','cdInterest','w2','otherIncome','filingStatus',
+  'annuityValue','annuityYear','annuityNotes','diyLow','diyHigh','targetBracket','diyNotes',
+  'riskPct','incomeGap','legacyNotes','estateNotes','annuityOpen','annuityComments',
+  'corrections','questions','bestContact'
+];
+const CHECK_IDS = ['c1','c2','c3','c4','c5','a1','a2','a3','a4'];
+
+function $(id) { return document.getElementById(id); }
+
+function collect() {
+  const data = { submittedAt: new Date().toISOString(), form: 'gary-conversation-tracker' };
+  FIELD_IDS.forEach(id => { data[id] = $(id)?.value ?? ''; });
+  CHECK_IDS.forEach(id => { data[id] = !!( $(id)?.checked ); });
+  return data;
+}
+
+function apply(data) {
+  if (!data) return;
+  FIELD_IDS.forEach(id => {
+    if (data[id] != null && $(id)) $(id).value = data[id];
+  });
+  CHECK_IDS.forEach(id => {
+    if (typeof data[id] === 'boolean' && $(id)) $(id).checked = data[id];
+  });
+}
+
+function saveLocal(manual) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(collect()));
+    $('savedHint').textContent = 'Draft saved ' + new Date().toLocaleTimeString();
+    if (manual) setStatus('Draft saved on this device.', 'ok');
+  } catch (e) {
+    if (manual) setStatus('Could not save locally.', 'err');
+  }
+}
+
+function loadLocal() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) apply(JSON.parse(raw));
+  } catch (_) {}
+}
+
+function setStatus(msg, cls) {
+  const el = $('status');
+  el.textContent = msg;
+  el.className = 'status' + (cls ? ' ' + cls : '');
+}
+
+function formatEmailBody(d) {
+  const lines = [
+    'GARY MARCHUK — CONVERSATION TRACKER (ONLINE SUBMIT)',
+    'Submitted: ' + d.submittedAt,
+    '',
+    '=== CONTACT ===',
+    `Name: ${d.fullName}`,
+    `Spouse: ${d.spouseName}`,
+    `Email: ${d.email}`,
+    `Phone: ${d.phone}`,
+    `Ages: you ${d.ageYou} / spouse ${d.ageSpouse}`,
+    '',
+    '=== GOALS ===',
+    d.primaryGoal,
+    d.otherGoals ? 'Other: ' + d.otherGoals : '',
+    `Constraints: bracket=${d.c1} IRMAA=${d.c2} count income=${d.c3} liquid=${d.c4} no income product=${d.c5}`,
+    '',
+    '=== BALANCES ===',
+    `Your IRAs: ${d.iraYou}`,
+    `Spouse IRAs: ${d.iraSpouse}`,
+    `Conservative sleeve: ${d.iraConservative}`,
+    `Market sleeve: ${d.iraMarket}`,
+    `Custodians: ${d.custodians}`,
+    `Roth: ${d.rothStatus}`,
+    '',
+    '=== INCOME / IRMAA ===',
+    `SS you / mo: ${d.ssYou}`,
+    `SS spouse / mo: ${d.ssSpouse}`,
+    `Muni ANNUAL: ${d.muniAnnual}`,
+    `Muni monthly avg: ${d.muniMonthly}`,
+    `CD interest / yr: ${d.cdInterest}`,
+    `W-2: ${d.w2}`,
+    `Other income: ${d.otherIncome}`,
+    `Filing: ${d.filingStatus}`,
+    '',
+    '=== 2028 ANNUITY ===',
+    `Value: ${d.annuityValue}  Year: ${d.annuityYear}`,
+    d.annuityNotes,
+    '',
+    '=== DIY CONVERSION ===',
+    `Range: ${d.diyLow} – ${d.diyHigh}`,
+    `Bracket target: ${d.targetBracket}`,
+    d.diyNotes,
+    '',
+    '=== RISK / LEGACY ===',
+    `Risk: ${d.riskPct}`,
+    `Income gap: ${d.incomeGap}`,
+    d.legacyNotes,
+    d.estateNotes,
+    '',
+    '=== ANNUITY STANCE ===',
+    `Open to discuss: ${d.annuityOpen}`,
+    `Surrender concern=${d.a1} Liquidity=${d.a2} Transparency=${d.a3} Not for income=${d.a4}`,
+    d.annuityComments,
+    '',
+    '=== CORRECTIONS / QUESTIONS ===',
+    d.corrections,
+    d.questions,
+    `Best contact: ${d.bestContact}`,
+  ];
+  return lines.filter(x => x !== undefined).join('\n');
+}
+
+function downloadJson() {
+  const d = collect();
+  const blob = new Blob([JSON.stringify(d, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'gary-marchuk-conversation-tracker.json';
+  a.click();
+  setStatus('JSON download started.', 'ok');
+}
+
+async function submitForm() {
+  const d = collect();
+  if (!d.fullName || !d.email) {
+    setStatus('Please add your name and email before submitting.', 'err');
+    return;
+  }
+  const btn = $('btnSubmit');
+  btn.disabled = true;
+  setStatus('Submitting…');
+  saveLocal(false);
+
+  const bodyText = formatEmailBody(d);
+  const payload = {
+    ...d,
+    firstName: (d.fullName || '').split(' ')[0] || 'Gary',
+    lastName: (d.fullName || '').split(' ').slice(1).join(' ') || 'Marchuk',
+    name: d.fullName,
+    tags: ['conversation-tracker', 'gary-marchuk', 'roth-conversion', 'rffa'],
+    source: 'gary-conversation-tracker',
+    notes: bodyText,
+    advisor: 'Johnny Harris',
+  };
+
+  let webhookOk = false;
+  try {
+    const res = await fetch(WEBHOOK_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      mode: 'cors',
+    });
+    webhookOk = res.ok || res.status === 200 || res.status === 201 || res.status === 202;
+  } catch (_) {
+    webhookOk = false;
+  }
+
+  // Always open email so Johnny gets a human-readable copy even if webhook fails
+  const subject = encodeURIComponent('Gary Marchuk — Conversation Tracker (online submit)');
+  const body = encodeURIComponent(bodyText);
+  window.location.href = `mailto:${ADVISOR_EMAIL}?subject=${subject}&body=${body}`;
+
+  setStatus(
+    webhookOk
+      ? 'Submitted — email draft opened, and a copy was sent to the CRM webhook.'
+      : 'Email draft opened with your answers. If it didn’t open, use Download copy and send the file.',
+    'ok'
+  );
+  btn.disabled = false;
+}
+
+// autosave
+document.addEventListener('DOMContentLoaded', () => {
+  loadLocal();
+  const form = document.getElementById('trackerForm');
+  form.addEventListener('input', () => saveLocal(false));
+  form.addEventListener('change', () => saveLocal(false));
+});
+</script>
+</body>
+</html>
