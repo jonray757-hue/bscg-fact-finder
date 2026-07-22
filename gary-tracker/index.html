@@ -154,8 +154,8 @@
     <div class="eyebrow">Live conversation tracker · Retirement Foundation for America</div>
     <h1>Gary Marchuk — update your numbers online</h1>
     <p>
-      We already tracked what we learned on our calls. Glance through, update anything that’s outdated,
-      and submit only if you change something — it comes straight to Johnny. Optional, not required before Zoom.
+      We already tracked what we learned on our calls. Glance through and update anything that’s outdated if you like.
+      Optional — not required before Zoom. Nothing is emailed or pushed to our CRM from this page yet.
     </p>
     <div class="chips">
       <span class="chip">Next: Wed 11:00 AM Eastern · Zoom</span>
@@ -431,16 +431,18 @@
     <div style="display:flex;gap:8px;flex-wrap:wrap">
       <button type="button" class="btn btn-secondary" onclick="saveLocal(true)">Save draft</button>
       <button type="button" class="btn btn-ghost" onclick="downloadJson()">Download copy</button>
-      <button type="button" class="btn btn-primary" id="btnSubmit" onclick="submitForm()">Submit to Johnny</button>
+      <button type="button" class="btn btn-primary" id="btnSubmit" onclick="submitForm()">Save updates</button>
     </div>
   </div>
 </div>
 
 <script>
 const STORAGE_KEY = 'gary-marchuk-conversation-tracker-v1';
+// Delivery off for now — no CRM webhook, no mailto until Johnny turns them on
+const ENABLE_WEBHOOK = false;
+const ENABLE_MAILTO = false;
 const ADVISOR_EMAIL = 'johnny@retirementfoundationforamerica.com';
-// Optional GHL webhook (Strategy) — same pattern as fact finder; tags identify this form
-const WEBHOOK_URL = 'https://services.leadconnectorhq.com/hooks/kxST06uaWK8TXSYUp0j9/webhook-trigger/Wc84awDofOqlinOdKYIj';
+const WEBHOOK_URL = '';
 
 const FIELD_IDS = [
   'fullName','spouseName','email','phone','ageYou','ageSpouse','primaryGoal','otherGoals',
@@ -573,46 +575,47 @@ function downloadJson() {
 
 async function submitForm() {
   const d = collect();
-  // Name/email already on file — never block submit for re-entry
   const btn = $('btnSubmit');
   btn.disabled = true;
-  setStatus('Submitting…');
+  setStatus('Saving…');
   saveLocal(false);
 
-  const bodyText = formatEmailBody(d);
-  const payload = {
-    ...d,
-    firstName: (d.fullName || '').split(' ')[0] || 'Gary',
-    lastName: (d.fullName || '').split(' ').slice(1).join(' ') || 'Marchuk',
-    name: d.fullName,
-    tags: ['conversation-tracker', 'gary-marchuk', 'roth-conversion', 'rffa'],
-    source: 'gary-conversation-tracker',
-    notes: bodyText,
-    advisor: 'Johnny Harris',
-  };
-
-  let webhookOk = false;
+  // Keep a dated snapshot so updates aren’t lost if he keeps editing
   try {
-    const res = await fetch(WEBHOOK_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-      mode: 'cors',
-    });
-    webhookOk = res.ok || res.status === 200 || res.status === 201 || res.status === 202;
-  } catch (_) {
-    webhookOk = false;
+    const snaps = JSON.parse(localStorage.getItem(STORAGE_KEY + '-submits') || '[]');
+    snaps.push(d);
+    localStorage.setItem(STORAGE_KEY + '-submits', JSON.stringify(snaps.slice(-20)));
+  } catch (_) {}
+
+  // Delivery intentionally OFF until Johnny enables it
+  if (ENABLE_WEBHOOK && WEBHOOK_URL) {
+    try {
+      await fetch(WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...d,
+          firstName: (d.fullName || '').split(' ')[0] || 'Gary',
+          lastName: (d.fullName || '').split(' ').slice(1).join(' ') || 'Marchuk',
+          name: d.fullName,
+          tags: ['conversation-tracker', 'gary-marchuk', 'roth-conversion', 'rffa'],
+          source: 'gary-conversation-tracker',
+          notes: formatEmailBody(d),
+          advisor: 'Johnny Harris',
+        }),
+        mode: 'cors',
+      });
+    } catch (_) {}
   }
 
-  // Always open email so Johnny gets a human-readable copy even if webhook fails
-  const subject = encodeURIComponent('Gary Marchuk — Conversation Tracker (online submit)');
-  const body = encodeURIComponent(bodyText);
-  window.location.href = `mailto:${ADVISOR_EMAIL}?subject=${subject}&body=${body}`;
+  if (ENABLE_MAILTO && ADVISOR_EMAIL) {
+    const subject = encodeURIComponent('Gary Marchuk — Conversation Tracker (online submit)');
+    const body = encodeURIComponent(formatEmailBody(d));
+    window.location.href = `mailto:${ADVISOR_EMAIL}?subject=${subject}&body=${body}`;
+  }
 
   setStatus(
-    webhookOk
-      ? 'Submitted — email draft opened, and a copy was sent to the CRM webhook.'
-      : 'Email draft opened with your answers. If it didn’t open, use Download copy and send the file.',
+    'Updates saved. Nothing was emailed or sent to our CRM — Johnny will review with you on Zoom (or you can use Download copy if you want a file).',
     'ok'
   );
   btn.disabled = false;
