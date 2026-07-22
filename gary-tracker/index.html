@@ -154,8 +154,8 @@
     <div class="eyebrow">Live conversation tracker · Retirement Foundation for America</div>
     <h1>Gary Marchuk — update your numbers online</h1>
     <p>
-      Pre-filled from our calls. Edit anything that looks off, then submit — it comes straight to Johnny.
-      Takes about 5–10 minutes. You can save and come back on this device.
+      We already tracked what we learned on our calls. Glance through, update anything that’s outdated,
+      and submit only if you change something — it comes straight to Johnny. Optional, not required before Zoom.
     </p>
     <div class="chips">
       <span class="chip">Next: Wed 11:00 AM Eastern · Zoom</span>
@@ -167,39 +167,56 @@
 
 <div class="wrap">
   <div class="banner">
-    <strong>Tip:</strong> Yellow-priority fields drive IRMAA room (especially <em>annual</em> muni interest).
-    Leave blanks if easier to cover on Zoom.
+    <strong>Optional:</strong> Only edit what needs correcting. Soft-yellow fields matter most for IRMAA
+    (especially <em>annual</em> muni interest). Everything else we can fill on Zoom.
   </div>
 
   <form id="trackerForm" onsubmit="return false;">
     <section>
-      <h2><span class="n">1</span> Contact</h2>
-      <div class="grid2">
-        <div class="field">
-          <label for="fullName">Your name</label>
-          <input id="fullName" name="fullName" type="text" value="Gary Marchuk" />
+      <h2><span class="n">1</span> On file for this conversation</h2>
+      <div class="pillbox" style="margin-bottom:12px">
+        We already have your contact details from our calls — you don’t need to re-enter them.
+        <div style="margin-top:8px;font-size:13.5px;line-height:1.5">
+          <strong>Gary Marchuk</strong><br/>
+          gmarchuk@icloud.com · +1 (678) 300-4234<br/>
+          Ages on file: you <strong>67</strong> · spouse <strong>63</strong>
         </div>
-        <div class="field">
-          <label for="spouseName">Spouse name</label>
-          <input id="spouseName" name="spouseName" type="text" placeholder="Optional" />
-        </div>
-        <div class="field">
-          <label for="email">Email</label>
-          <input id="email" name="email" type="email" value="gmarchuk@icloud.com" />
-        </div>
-        <div class="field">
-          <label for="phone">Phone</label>
-          <input id="phone" name="phone" type="tel" value="+16783004234" />
-        </div>
-        <div class="field">
-          <label for="ageYou">Your age</label>
-          <input id="ageYou" name="ageYou" type="text" value="67" />
-        </div>
-        <div class="field">
-          <label for="ageSpouse">Spouse age</label>
-          <input id="ageSpouse" name="ageSpouse" type="text" value="63" />
-        </div>
+        <div class="hint" style="margin-top:8px">Only change something below if it’s wrong or outdated.</div>
       </div>
+      <!-- Pre-filled for submit; kept as optional corrections, not a gate -->
+      <details>
+        <summary style="cursor:pointer;font-size:13px;font-weight:600;color:var(--brand);margin-bottom:10px">Need to correct name, email, phone, or ages?</summary>
+        <div class="grid2" style="margin-top:10px">
+          <div class="field">
+            <label for="fullName">Name</label>
+            <input id="fullName" name="fullName" type="text" value="Gary Marchuk" autocomplete="name" />
+          </div>
+          <div class="field">
+            <label for="spouseName">Spouse name</label>
+            <input id="spouseName" name="spouseName" type="text" placeholder="Optional" />
+          </div>
+          <div class="field">
+            <label for="email">Email</label>
+            <input id="email" name="email" type="email" value="gmarchuk@icloud.com" autocomplete="email" />
+          </div>
+          <div class="field">
+            <label for="phone">Phone</label>
+            <input id="phone" name="phone" type="tel" value="+16783004234" autocomplete="tel" />
+          </div>
+          <div class="field">
+            <label for="ageYou">Your age</label>
+            <input id="ageYou" name="ageYou" type="text" value="67" />
+          </div>
+          <div class="field">
+            <label for="ageSpouse">Spouse age</label>
+            <input id="ageSpouse" name="ageSpouse" type="text" value="63" />
+          </div>
+        </div>
+      </details>
+      <!-- Hidden defaults always present for submit if details never opened -->
+      <input type="hidden" id="defaultFullName" value="Gary Marchuk" />
+      <input type="hidden" id="defaultEmail" value="gmarchuk@icloud.com" />
+      <input type="hidden" id="defaultPhone" value="+16783004234" />
     </section>
 
     <section>
@@ -441,6 +458,10 @@ function collect() {
   const data = { submittedAt: new Date().toISOString(), form: 'gary-conversation-tracker' };
   FIELD_IDS.forEach(id => { data[id] = $(id)?.value ?? ''; });
   CHECK_IDS.forEach(id => { data[id] = !!( $(id)?.checked ); });
+  // Always fall back to known contact on file — never force Gary to re-type these
+  if (!String(data.fullName || '').trim()) data.fullName = $('defaultFullName')?.value || 'Gary Marchuk';
+  if (!String(data.email || '').trim()) data.email = $('defaultEmail')?.value || 'gmarchuk@icloud.com';
+  if (!String(data.phone || '').trim()) data.phone = $('defaultPhone')?.value || '+16783004234';
   return data;
 }
 
@@ -552,10 +573,7 @@ function downloadJson() {
 
 async function submitForm() {
   const d = collect();
-  if (!d.fullName || !d.email) {
-    setStatus('Please add your name and email before submitting.', 'err');
-    return;
-  }
+  // Name/email already on file — never block submit for re-entry
   const btn = $('btnSubmit');
   btn.disabled = true;
   setStatus('Submitting…');
