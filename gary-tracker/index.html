@@ -418,7 +418,7 @@
 
   <footer>
     Retirement Foundation for America / Black Sand Capital Group · For planning discussion only — not tax, legal, or investment advice.
-    Data saves on this device. Submit opens an email summary to Johnny — nothing posts to CRM from this page.
+    Data saves on this device. Submit opens an email summary to Johnny (johnny@blacksandcapitalgroup.com) — nothing posts to CRM from this page.
     Questions: text or email Johnny.
   </footer>
 </div>
@@ -439,11 +439,9 @@
 
 <script>
 const STORAGE_KEY = 'gary-marchuk-conversation-tracker-v1';
-// Email summary ON. No CRM webhook (no BSS / BSCG / Strategy). RFFA notes, if any, are updated manually by Johnny — never from this public page.
-const ENABLE_WEBHOOK = false;
+// Email summary only → Johnny's primary BSCG inbox. No GHL / CRM webhook of any kind.
 const ENABLE_MAILTO = true;
-const ADVISOR_EMAIL = 'johnny@retirementfoundationforamerica.com';
-const WEBHOOK_URL = '';
+const ADVISOR_EMAIL = 'johnny@blacksandcapitalgroup.com';
 
 const FIELD_IDS = [
   'fullName','spouseName','email','phone','ageYou','ageSpouse','primaryGoal','otherGoals',
@@ -588,27 +586,7 @@ async function submitForm() {
     localStorage.setItem(STORAGE_KEY + '-submits', JSON.stringify(snaps.slice(-20)));
   } catch (_) {}
 
-  // Webhook stays OFF — do not post to BSS, BSCG, Strategy, or any GHL location from this page
-  if (ENABLE_WEBHOOK && WEBHOOK_URL) {
-    try {
-      await fetch(WEBHOOK_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...d,
-          firstName: (d.fullName || '').split(' ')[0] || 'Gary',
-          lastName: (d.fullName || '').split(' ').slice(1).join(' ') || 'Marchuk',
-          name: d.fullName,
-          tags: ['conversation-tracker', 'gary-marchuk', 'roth-conversion', 'rffa'],
-          source: 'gary-conversation-tracker',
-          notes: formatEmailBody(d),
-          advisor: 'Johnny Harris',
-        }),
-        mode: 'cors',
-      });
-    } catch (_) {}
-  }
-
+  // No fetch/webhook — email only. This page never posts to GHL or any CRM.
   if (ENABLE_MAILTO && ADVISOR_EMAIL) {
     const subject = encodeURIComponent('Gary Marchuk — Conversation Tracker (online submit)');
     const body = encodeURIComponent(formatEmailBody(d));
