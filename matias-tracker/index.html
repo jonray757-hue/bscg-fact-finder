@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Conversation Recap — Rick Matias · Fill Online</title>
+<style>
+  :root {
+    --ink: #1a2332;
+    --muted: #5a6570;
+    --line: #d0d7e0;
+    --brand: #0f3d2e;
+    --brand2: #1a5c45;
+    --soft: #e8f2ed;
+    --accent: #c45c26;
+    --warn: #fff6eb;
+    --ok: #eaf6ef;
+    --bg: #f0f3f6;
+    --card: #fff;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.45;
+    font-size: 15px;
+  }
+  .top {
+    background: linear-gradient(135deg, var(--brand), var(--brand2));
+    color: #fff;
+    padding: 22px 18px 20px;
+  }
+  .top-inner { max-width: 840px; margin: 0 auto; }
+  .eyebrow { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; opacity: .85; }
+  h1 { margin: 6px 0 8px; font-size: 24px; line-height: 1.2; }
+  .top p { margin: 0; opacity: .93; font-size: 14px; max-width: 640px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+  .chip {
+    background: rgba(255,255,255,.14);
+    border: 1px solid rgba(255,255,255,.25);
+    border-radius: 999px;
+    padding: 5px 11px;
+    font-size: 12px;
+  }
+  .wrap { max-width: 840px; margin: 0 auto; padding: 18px 16px 110px; }
+  .banner {
+    background: var(--warn);
+    border-left: 4px solid var(--accent);
+    padding: 12px 14px;
+    border-radius: 0 10px 10px 0;
+    margin-bottom: 16px;
+    font-size: 13.5px;
+  }
+  .banner strong { color: var(--brand); }
+  section {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 16px 16px 14px;
+    margin-bottom: 12px;
+  }
+  h2 {
+    margin: 0 0 12px;
+    font-size: 15px;
+    color: var(--brand);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  h2 .n {
+    width: 24px; height: 24px; border-radius: 50%;
+    background: var(--soft); color: var(--brand);
+    font-size: 12px; font-weight: 700;
+    display: inline-flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+  @media (max-width: 680px) {
+    .grid2, .grid3 { grid-template-columns: 1fr; }
+  }
+  label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: .03em;
+    margin-bottom: 4px;
+  }
+  input[type="text"], input[type="email"], input[type="tel"], input[type="number"], select, textarea {
+    width: 100%;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 9px 10px;
+    font-size: 14px;
+    font-family: inherit;
+    background: #fff;
+    color: var(--ink);
+  }
+  input:focus, select:focus, textarea:focus {
+    outline: 2px solid rgba(15,61,46,.25);
+    border-color: var(--brand);
+  }
+  textarea { min-height: 72px; resize: vertical; }
+  .field { margin-bottom: 10px; }
+  .hint { font-size: 12px; color: var(--muted); margin-top: 3px; }
+  .checkrow {
+    display: flex; gap: 8px; align-items: flex-start;
+    padding: 8px 0; border-bottom: 1px solid #eef1f4; font-size: 13.5px;
+  }
+  .checkrow:last-child { border-bottom: 0; }
+  .checkrow input { margin-top: 3px; width: auto; }
+  .pillbox {
+    background: var(--soft);
+    border: 1px solid #c5ddd0;
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 13px;
+    margin-bottom: 10px;
+  }
+  .pillbox.warn {
+    background: var(--warn);
+    border-color: #f0d0b0;
+  }
+  .statgrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  @media (max-width: 680px) { .statgrid { grid-template-columns: 1fr 1fr; } }
+  .stat {
+    background: #f7f9fb;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 10px;
+  }
+  .stat .v { font-size: 18px; font-weight: 700; color: var(--brand); }
+  .stat .l { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .03em; margin-top: 2px; }
+  .timeline {
+    border-left: 3px solid #c5ddd0;
+    margin: 4px 0 0 8px;
+    padding-left: 14px;
+  }
+  .titem { margin-bottom: 12px; }
+  .titem .when {
+    font-size: 11px; font-weight: 700; color: var(--brand);
+    text-transform: uppercase; letter-spacing: .04em;
+  }
+  .titem .what { font-size: 13.5px; margin-top: 2px; }
+  .compare {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  .compare th, .compare td {
+    border: 1px solid var(--line);
+    padding: 8px 10px;
+    text-align: left;
+    vertical-align: top;
+  }
+  .compare th { background: var(--soft); color: var(--brand); font-size: 12px; }
+  details {
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+    background: #fafbfc;
+  }
+  details summary {
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--brand);
+    font-size: 13.5px;
+  }
+  details[open] summary { margin-bottom: 8px; }
+  footer {
+    text-align: center;
+    color: var(--muted);
+    font-size: 12px;
+    padding: 8px 16px 24px;
+    max-width: 840px;
+    margin: 0 auto;
+  }
+  .sticky-bar {
+    position: fixed; left: 0; right: 0; bottom: 0;
+    background: rgba(255,255,255,.96);
+    border-top: 1px solid var(--line);
+    backdrop-filter: blur(8px);
+    padding: 10px 14px;
+    z-index: 20;
+  }
+  .sticky-inner {
+    max-width: 840px; margin: 0 auto;
+    display: flex; gap: 10px; align-items: center; justify-content: space-between; flex-wrap: wrap;
+  }
+  .btn {
+    border: 0; border-radius: 9px; padding: 10px 14px;
+    font-size: 13.5px; font-weight: 600; cursor: pointer; font-family: inherit;
+  }
+  .btn-primary { background: var(--brand); color: #fff; }
+  .btn-secondary { background: #e8eef2; color: var(--ink); }
+  .btn-ghost { background: transparent; border: 1px solid var(--line); color: var(--ink); }
+  .btn:disabled { opacity: .55; cursor: wait; }
+  .status { font-size: 13px; color: var(--muted); }
+  .status.ok { color: #1a6b45; }
+  .status.err { color: #a12b2b; }
+  .saved { font-size: 11px; color: var(--muted); }
+  @media print {
+    .sticky-bar, .top { position: static; }
+    body { background: #fff; }
+    .wrap { padding-bottom: 20px; }
+  }
+</style>
+</head>
+<body>
+<div class="top">
+  <div class="top-inner">
+    <div class="eyebrow">Strong Retirement Group · Black Sand Capital Group</div>
+    <h1>Rick Matias — Planning recap</h1>
+    <p>
+      Professional summary of our conversations so far — not a homework packet.
+      Numbers and decisions below reflect where we left off. Edit anything that needs correcting
+      and email a summary to Johnny when ready.
+    </p>
+    <div class="chips">
+      <span class="chip">Age 71 · Florida / Toronto</span>
+      <span class="chip">DOB 01/09/1955</span>
+      <span class="chip">Conversations 1–7</span>
+      <span class="chip">Illustrations: Lincoln NQ + Nassau Q</span>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="banner">
+    <strong>Where we are right now:</strong>
+    Keep <strong>Equitrust Market Seven</strong> and plan single-life income ~July 2027 (~$34k).
+    Preferred first move on liquid cash: <strong>Path B</strong> — place savings into a <strong>growth FIA</strong>
+    (free-withdrawal design, not another income annuity), then use ~10% free withdrawal if needed for 2024 taxes.
+    Principal / other qualified accounts can follow as a separate landing pad. Estate / LLC work still open before income turns on.
+  </div>
+
+  <form id="trackerForm" onsubmit="return false;">
+    <section>
+      <h2><span class="n">1</span> Contact on file</h2>
+      <div class="pillbox">
+        Contact is already on file — no need to re-enter. Open only if something should be corrected.
+      </div>
+      <details>
+        <summary>View / correct contact details</summary>
+        <div class="grid2" style="margin-top:8px">
+          <div class="field">
+            <label for="fullName">Name</label>
+            <input id="fullName" type="text" value="Rick Matias" />
+          </div>
+          <div class="field">
+            <label for="spouseName">Spouse / partner</label>
+            <input id="spouseName" type="text" value="Adelaide (Addie) Pampa — common-law (Canada); FL does not recognize" />
+          </div>
+          <div class="field">
+            <label for="email">Email</label>
+            <input id="email" type="email" value="rickmatias98@yahoo.com" />
+          </div>
+          <div class="field">
+            <label for="phone">Phone</label>
+            <input id="phone" type="tel" value="+16077447997" />
+          </div>
+          <div class="field">
+            <label for="address">Address</label>
+            <input id="address" type="text" value="11600 109th St, Largo, FL 33778 (also Toronto ~6 months)" />
+          </div>
+          <div class="field">
+            <label for="bestContact">Best way to reach you</label>
+            <input id="bestContact" type="text" value="Text or Yahoo email (check spam)" />
+          </div>
+        </div>
+      </details>
+      <input type="hidden" id="defaultFullName" value="Rick Matias" />
+      <input type="hidden" id="defaultEmail" value="rickmatias98@yahoo.com" />
+      <input type="hidden" id="defaultPhone" value="+16077447997" />
+    </section>
+
+    <section>
+      <h2><span class="n">2</span> Snapshot (from our talks)</h2>
+      <div class="statgrid">
+        <div class="stat"><div class="v">~$2,450–2,500</div><div class="l">SS / mo (current)</div></div>
+        <div class="stat"><div class="v">~$120k</div><div class="l">Cash savings (focus)</div></div>
+        <div class="stat"><div class="v">~$336k</div><div class="l">Equitrust accum.</div></div>
+        <div class="stat"><div class="v">~$308k</div><div class="l">Equitrust CSV</div></div>
+        <div class="stat"><div class="v">~$120–130k</div><div class="l">401(k)s total est.</div></div>
+        <div class="stat"><div class="v">~$34k</div><div class="l">Eq. income @ 72</div></div>
+      </div>
+      <div class="grid2">
+        <div class="field">
+          <label for="cashAmount">Exact savings amount to place first (Path B)</label>
+          <input id="cashAmount" type="text" value="~$120,000 (confirm exact)" />
+          <div class="hint">You preferred moving savings first, then ~10% free withdrawal for taxes if needed.</div>
+        </div>
+        <div class="field">
+          <label for="incomeStart">When do you want new FIA income / withdrawals?</label>
+          <input id="incomeStart" type="text" value="Let cook ~1 year if possible; taxes may need ~10% sooner" />
+        </div>
+      </div>
+      <div class="field">
+        <label for="otherAssets">Other assets to consolidate (notes)</label>
+        <textarea id="otherAssets">Principal ~$80k + ~$30–40k; Optimum small 401ks ~$10k; Truist ~$20–30k; U.S. Bank ~$30–40k idle; IBM ~50 shares; BlackRock ~$20k; Largo 5-bed rental (lives in RV/trailer on property); Canadian RBC corporate account (not personal).</textarea>
+      </div>
+    </section>
+
+    <section>
+      <h2><span class="n">3</span> Decisions already made</h2>
+      <div class="checkrow"><input type="checkbox" id="d1" checked /><label for="d1" style="text-transform:none;font-weight:500;color:var(--ink)">Keep Equitrust Market Seven — plan single-life income ~July 2027 (~$34k / yr)</label></div>
+      <div class="checkrow"><input type="checkbox" id="d2" checked /><label for="d2" style="text-transform:none;font-weight:500;color:var(--ink)">Do <strong>not</strong> add spousal continuation on Equitrust (drops payout ~7.7% → ~5.7%) — Addie as beneficiary / trust for lump sum</label></div>
+      <div class="checkrow"><input type="checkbox" id="d3" checked /><label for="d3" style="text-transform:none;font-weight:500;color:var(--ink)">Prefer growth FIA (free withdrawal) over another income-annuity / depleting rider design</label></div>
+      <div class="checkrow"><input type="checkbox" id="d4" checked /><label for="d4" style="text-transform:none;font-weight:500;color:var(--ink)">Path B first: move liquid savings into FIA before / instead of rushing all qualified rollovers</label></div>
+      <div class="checkrow"><input type="checkbox" id="d5" checked /><label for="d5" style="text-transform:none;font-weight:500;color:var(--ink)">Principal / qualified money still in plan for later rollover + mirrored Roth (RMD path)</label></div>
+      <div class="checkrow"><input type="checkbox" id="d6" /><label for="d6" style="text-transform:none;font-weight:500;color:var(--ink)">Exact dollar amount for first FIA confirmed with Johnny</label></div>
+      <div class="field" style="margin-top:10px">
+        <label for="decisionNotes">Anything to change about the above?</label>
+        <textarea id="decisionNotes" placeholder="Corrections welcome…"></textarea>
+      </div>
+    </section>
+
+    <section>
+      <h2><span class="n">4</span> Illustration packet (what this email is about)</h2>
+      <div class="pillbox">
+        These are <strong>hypothetical illustrations only</strong> — not guarantees. Full PDFs must be read as complete packages.
+        They line up with two different buckets of money, not two replacements for Equitrust.
+      </div>
+      <table class="compare">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Lincoln OptiBlend® 10 — $120k</th>
+            <th>Nassau Growth — $125k</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Tax status on PDF</strong></td>
+            <td><strong>Nonqualified</strong> (matches liquid savings path)</td>
+            <td><strong>Qualified</strong> (IRA / 401k-style path)</td>
+          </tr>
+          <tr>
+            <td><strong>Role in plan</strong></td>
+            <td>Growth + 10% free-withdrawal access — Path B cash</td>
+            <td>Qualified growth pad; optional lifetime income rider (not required)</td>
+          </tr>
+          <tr>
+            <td><strong>Vs Equitrust</strong></td>
+            <td>Does <em>not</em> replace Equitrust income plan</td>
+            <td>Does <em>not</em> replace Equitrust — separate qualified bucket</td>
+          </tr>
+          <tr>
+            <td><strong>Headline “what if”</strong></td>
+            <td>10-yr up-market: ~$113k income out, ~$123.9k still left</td>
+            <td>10-yr recent path accum. (no WD) ~high $200ks; income rider base can grow if deferred</td>
+          </tr>
+          <tr>
+            <td><strong>Fees (as discussed)</strong></td>
+            <td>No product fee on this design (index rules / participation apply)</td>
+            <td>Amplified Income rider illustrated as no fee; strategy fees only if enhanced options used</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="field" style="margin-top:12px">
+        <label for="illustrationNotes">Questions after reviewing the PDFs</label>
+        <textarea id="illustrationNotes" placeholder="What stood out? What still feels unclear?"></textarea>
+      </div>
+      <div class="grid2">
+        <div class="field">
+          <label for="prefPath">Which first-move path feels right?</label>
+          <select id="prefPath">
+            <option value="path-b" selected>Path B — savings → FIA first (preferred on last call)</option>
+            <option value="path-a">Path A — qualified rollover first, then free WD for taxes</option>
+            <option value="unsure">Still weighing both</option>
+            <option value="other">Other / notes below</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="carrierLean">Carrier lean after reading</label>
+          <select id="carrierLean">
+            <option value="lincoln">Lincoln (stress-test baseline)</option>
+            <option value="nassau">Nassau (qualified sample)</option>
+            <option value="compare">Want more side-by-side carriers</option>
+            <option value="bonus">Interested in premium-bonus options too</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2><span class="n">5</span> Equitrust (keep) — open items</h2>
+      <div class="checkrow"><input type="checkbox" id="e1" /><label for="e1" style="text-transform:none;font-weight:500;color:var(--ink)">Agent-of-record form signed (Johnny assisting on account)</label></div>
+      <div class="checkrow"><input type="checkbox" id="e2" /><label for="e2" style="text-transform:none;font-weight:500;color:var(--ink)">Reallocation form submitted (anniversary window)</label></div>
+      <div class="checkrow"><input type="checkbox" id="e3" /><label for="e3" style="text-transform:none;font-weight:500;color:var(--ink)">Comfortable with single-life income ~July 2027 plan</label></div>
+      <div class="checkrow"><input type="checkbox" id="e4" /><label for="e4" style="text-transform:none;font-weight:500;color:var(--ink)">Aware 7% free WD available now without turning income on</label></div>
+      <div class="field">
+        <label for="equitrustNotes">Equitrust notes / allocation preference</label>
+        <textarea id="equitrustNotes">~49% fixed / ~51% 1-yr PTP historically; interested in reducing fixed % for better index potential. IBR fee ~1.25%/yr; 25% bonus was on benefit base only.</textarea>
+      </div>
+    </section>
+
+    <section>
+      <h2><span class="n">6</span> Tax, estate & tools</h2>
+      <div class="grid2">
+        <div class="field">
+          <label for="taxStatus">Tax returns status</label>
+          <input id="taxStatus" type="text" value="2024 return in progress (~$20k est. before more deductions); prior years filed $0 owed" />
+        </div>
+        <div class="field">
+          <label for="rmdNotes">RMD / Roth notes</label>
+          <input id="rmdNotes" type="text" value="RMDs ~age 73; mirrored Roth with qualified FIA to burn taxes gradually" />
+        </div>
+      </div>
+      <div class="checkrow"><input type="checkbox" id="t1" /><label for="t1" style="text-transform:none;font-weight:500;color:var(--ink)">Right Capital logged in + accounts linked</label></div>
+      <div class="checkrow"><input type="checkbox" id="t2" /><label for="t2" style="text-transform:none;font-weight:500;color:var(--ink)">EstateGuru intake started / finished</label></div>
+      <div class="checkrow"><input type="checkbox" id="t3" /><label for="t3" style="text-transform:none;font-weight:500;color:var(--ink)">Mortgage company asked about LLC title transfer on Largo rental</label></div>
+      <div class="checkrow"><input type="checkbox" id="t4" /><label for="t4" style="text-transform:none;font-weight:500;color:var(--ink)">Living trust path preferred over handwritten will only</label></div>
+      <div class="field">
+        <label for="taxEstateNotes">Anything else on tax / estate?</label>
+        <textarea id="taxEstateNotes" placeholder="CPA, LLC, Addie / kids beneficiaries, grandson college, etc."></textarea>
+      </div>
+    </section>
+
+    <section>
+      <h2><span class="n">7</span> Conversation timeline (condensed)</h2>
+      <div class="timeline">
+        <div class="titem"><div class="when">#1 · Discovery</div><div class="what">Background, $120k cash, Equitrust + Principal, taxes behind, no trust, Florida/Toronto.</div></div>
+        <div class="titem"><div class="when">#2 · Equitrust 3-way</div><div class="what">Values verified (~$336k AV / ~$308k CSV / IBR base ~$429k). NQ contract. Income ~$32–34k if activated. Bonus on IBR base only.</div></div>
+        <div class="titem"><div class="when">#3 · Debrief</div><div class="what">Statements in; 10% free WD vs income rider vs 1035 modeled; Right Capital / EstateGuru onboarding.</div></div>
+        <div class="titem"><div class="when">#4 · Family / tax / strategy</div><div class="what">Addie + kids; premium-bonus FIA idea; tax scare quotes; LLC/trust; Zoom with Addie set.</div></div>
+        <div class="titem"><div class="when">#5 · Principal + Lincoln intro</div><div class="what">Right Capital live; Principal underperforming; Lincoln 55% participation explained; Zoom setup hiccup.</div></div>
+        <div class="titem"><div class="when">#6 · Decision</div><div class="what"><strong>Keep Equitrust</strong> (income 2027). Roll Principal later into growth FIA. Free WD design preserves legacy for Addie. Reallocation + AOR form open.</div></div>
+        <div class="titem"><div class="when">#7 · Tax + Path B</div><div class="what">2024 software return; tuition deduction blocked; Path B preferred (savings → FIA first). Growth vs income clarified. Mirrored Roth path for qualified money. Illustrations promised once amount confirmed.</div></div>
+      </div>
+      <div class="field" style="margin-top:10px">
+        <label for="timelineCorrections">Anything we got wrong on prior calls?</label>
+        <textarea id="timelineCorrections" placeholder="Type corrections here…"></textarea>
+      </div>
+    </section>
+
+    <section>
+      <h2><span class="n">8</span> Open questions for next Zoom</h2>
+      <div class="field">
+        <label for="questions">What do you want answered first?</label>
+        <textarea id="questions" placeholder="e.g. exact premium, allocation on Equitrust, Principal timing, trust for Addie…">Exact savings amount for first FIA; walk Lincoln vs Nassau pages; confirm Path B sequence for taxes; Principal timing; AOR + reallocation status.</textarea>
+      </div>
+    </section>
+  </form>
+
+  <footer>
+    Strong Retirement Group / Black Sand Capital Group · For planning discussion only — not tax, legal, or investment advice.
+    Illustrations are hypothetical and valid only with all pages. Data saves on this device. Submit opens an email summary to Johnny
+    (johnny@blacksandcapitalgroup.com) — nothing posts to CRM from this page.
+  </footer>
+</div>
+
+<div class="sticky-bar">
+  <div class="sticky-inner">
+    <div>
+      <div class="status" id="status">Ready when you are</div>
+      <div class="saved" id="savedHint">Autosaves on this device</div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button type="button" class="btn btn-secondary" onclick="saveLocal(true)">Save draft</button>
+      <button type="button" class="btn btn-ghost" onclick="downloadJson()">Download copy</button>
+      <button type="button" class="btn btn-primary" id="btnSubmit" onclick="submitForm()">Email summary</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const STORAGE_KEY = 'rick-matias-conversation-tracker-v1';
+// Email only → Johnny primary BSCG inbox. No GHL / CRM webhook.
+const ENABLE_MAILTO = true;
+const ADVISOR_EMAIL = 'johnny@blacksandcapitalgroup.com';
+
+const FIELD_IDS = [
+  'fullName','spouseName','email','phone','address','bestContact',
+  'cashAmount','incomeStart','otherAssets','decisionNotes',
+  'illustrationNotes','prefPath','carrierLean','equitrustNotes',
+  'taxStatus','rmdNotes','taxEstateNotes','timelineCorrections','questions'
+];
+const CHECK_IDS = ['d1','d2','d3','d4','d5','d6','e1','e2','e3','e4','t1','t2','t3','t4'];
+
+function $(id) { return document.getElementById(id); }
+
+function collect() {
+  const data = { submittedAt: new Date().toISOString(), form: 'rick-matias-conversation-tracker' };
+  FIELD_IDS.forEach(id => { data[id] = $(id)?.value ?? ''; });
+  CHECK_IDS.forEach(id => { data[id] = !!($(id)?.checked); });
+  if (!String(data.fullName || '').trim()) data.fullName = $('defaultFullName')?.value || 'Rick Matias';
+  if (!String(data.email || '').trim()) data.email = $('defaultEmail')?.value || 'rickmatias98@yahoo.com';
+  if (!String(data.phone || '').trim()) data.phone = $('defaultPhone')?.value || '+16077447997';
+  return data;
+}
+
+function apply(data) {
+  if (!data) return;
+  FIELD_IDS.forEach(id => {
+    if (data[id] != null && $(id)) $(id).value = data[id];
+  });
+  CHECK_IDS.forEach(id => {
+    if (typeof data[id] === 'boolean' && $(id)) $(id).checked = data[id];
+  });
+}
+
+function saveLocal(manual) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(collect()));
+    $('savedHint').textContent = 'Draft saved ' + new Date().toLocaleTimeString();
+    if (manual) setStatus('Draft saved on this device.', 'ok');
+  } catch (e) {
+    if (manual) setStatus('Could not save locally.', 'err');
+  }
+}
+
+function loadLocal() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) apply(JSON.parse(raw));
+  } catch (_) {}
+}
+
+function setStatus(msg, cls) {
+  const el = $('status');
+  el.textContent = msg;
+  el.className = 'status' + (cls ? ' ' + cls : '');
+}
+
+function formatEmailBody(d) {
+  const lines = [
+    'RICK MATIAS — CONVERSATION TRACKER (ONLINE SUBMIT)',
+    'Submitted: ' + d.submittedAt,
+    '',
+    '=== CONTACT ===',
+    `Name: ${d.fullName}`,
+    `Partner: ${d.spouseName}`,
+    `Email: ${d.email}`,
+    `Phone: ${d.phone}`,
+    `Address: ${d.address}`,
+    `Best contact: ${d.bestContact}`,
+    '',
+    '=== PATH / AMOUNTS ===',
+    `Cash to place (Path B): ${d.cashAmount}`,
+    `Income / WD timing: ${d.incomeStart}`,
+    `Preferred path: ${d.prefPath}`,
+    `Carrier lean: ${d.carrierLean}`,
+    '',
+    '=== DECISIONS (checked) ===',
+    `Keep Equitrust Jul 2027 income: ${d.d1}`,
+    `No spousal rider / Addie beneficiary-trust: ${d.d2}`,
+    `Prefer growth FIA free WD: ${d.d3}`,
+    `Path B savings first: ${d.d4}`,
+    `Principal later + Roth pad: ${d.d5}`,
+    `Exact $ confirmed: ${d.d6}`,
+    d.decisionNotes ? 'Notes: ' + d.decisionNotes : '',
+    '',
+    '=== ILLUSTRATIONS ===',
+    d.illustrationNotes,
+    '',
+    '=== EQUITRUST OPEN ITEMS ===',
+    `AOR signed: ${d.e1} | Realloc submitted: ${d.e2} | Comfortable 2027 income: ${d.e3} | Knows 7% free WD: ${d.e4}`,
+    d.equitrustNotes,
+    '',
+    '=== TAX / ESTATE / TOOLS ===',
+    d.taxStatus,
+    d.rmdNotes,
+    `Right Capital: ${d.t1} | EstateGuru: ${d.t2} | Mortgage/LLC: ${d.t3} | Living trust lean: ${d.t4}`,
+    d.taxEstateNotes,
+    '',
+    '=== OTHER ASSETS ===',
+    d.otherAssets,
+    '',
+    '=== CORRECTIONS / QUESTIONS ===',
+    d.timelineCorrections,
+    d.questions,
+  ];
+  return lines.filter(x => x !== undefined).join('\n');
+}
+
+function downloadJson() {
+  const d = collect();
+  const blob = new Blob([JSON.stringify(d, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'rick-matias-conversation-tracker.json';
+  a.click();
+  setStatus('JSON download started.', 'ok');
+}
+
+async function submitForm() {
+  const d = collect();
+  const btn = $('btnSubmit');
+  btn.disabled = true;
+  setStatus('Preparing email summary…');
+  saveLocal(false);
+  try {
+    const snaps = JSON.parse(localStorage.getItem(STORAGE_KEY + '-submits') || '[]');
+    snaps.push(d);
+    localStorage.setItem(STORAGE_KEY + '-submits', JSON.stringify(snaps.slice(-20)));
+  } catch (_) {}
+
+  if (ENABLE_MAILTO && ADVISOR_EMAIL) {
+    const subject = encodeURIComponent('Rick Matias — Conversation Tracker (online submit)');
+    const body = encodeURIComponent(formatEmailBody(d));
+    window.location.href = `mailto:${ADVISOR_EMAIL}?subject=${subject}&body=${body}`;
+    setStatus(
+      'Draft saved. Your email app should open with a summary to Johnny — send when ready. Nothing was posted to CRM.',
+      'ok'
+    );
+  } else {
+    setStatus('Updates saved on this device. Use Download copy if you want a file.', 'ok');
+  }
+  btn.disabled = false;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  loadLocal();
+  const form = document.getElementById('trackerForm');
+  form.addEventListener('input', () => saveLocal(false));
+  form.addEventListener('change', () => saveLocal(false));
+});
+</script>
+</body>
+</html>
